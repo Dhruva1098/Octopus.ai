@@ -1,0 +1,32 @@
+.search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    margin-top: 100px;
+  }
+  
+  .search-input {
+    border: 3px solid #000;   /* Dark boundary */
+    border-radius: 40px;      /* Pill shape */
+    background-color: #fff;
+    width: 600px;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    outline: none;
+  }
+  
+  .search-button {
+    border: 3px solid #000;   /* Dark boundary */
+    border-radius: 50px;      /* Pill shape */
+    background-color: #fff;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(32, 33, 36, 0.28);
+  }
+  
+  .search-button:hover {
+    background-color: #e8e9ea;
+  }
