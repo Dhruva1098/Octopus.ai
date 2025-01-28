@@ -1,5 +1,5 @@
 from py2neo import Graph
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 
 embedder = HuggingFaceEmbeddings(model_name = "sentence-transformers/all-MiniLM-L6-v2")
 neo4j_graph = Graph("bolt://localhost:7687", auth=("neo4j", "password"))

@@ -6,3 +6,7 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     notes = db.relationship('Note', backref='user', lazy=True)
 
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+        self.notes = []

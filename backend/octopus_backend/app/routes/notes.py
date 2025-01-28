@@ -13,13 +13,13 @@ def create_note():
     user_id = data.get('user_id')
     content = data.get('content')
 
-    note = Note(content=content, user_id=user_id)
-    db.session.add(note)
+    notes = Note(content=content, user_id=user_id)
+    db.session.add(notes)
     db.session.commit()
 
-    create_embeddings_and_relationships(note.id, content, user_id)
+    create_embeddings_and_relationships(notes.id, content, user_id)
 
-    return jsonify({'note_id': note.id})
+    return jsonify({'note_id': notes.id})
 
 @notes_bp.route('/notes/<int:user_id>', methods=['GET'])
 def get_notes(user_id):

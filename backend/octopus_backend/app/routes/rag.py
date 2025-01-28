@@ -1,13 +1,14 @@
 from flask import request, jsonify, Blueprint
 from langchain.chains.retrieval_qa.base import RetrievalQA
-from langchain.llms import HuggingFacePipeline
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from langchain_huggingface import HuggingFacePipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from backend.octopus_backend.app.utils.neo4j import embedder, neo4j_graph
 
 rag_bp = Blueprint('rag', __name__)
 tokenizer = AutoTokenizer.from_pretrained('gpt2')
 model = AutoModelForCausalLM.from_pretrained("gpt2")
-llm = HuggingFacePipeline(pipeline="text-generation", model=model, tokenizer=tokenizer)
+pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
+llm = HuggingFacePipeline(pipeline=pipe)
 
 @rag_bp.route('/ask', methods=["POST"])
 def ask_question():
