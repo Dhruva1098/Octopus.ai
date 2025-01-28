@@ -1,5 +1,5 @@
 from flask import Flask
-from backend.octopus_backend.app.utils.db import init_db
+from backend.octopus_backend.app.utils.db import init_db, db
 from backend.octopus_backend.app.routes import notes, rag, auth
 def create_app():
     app = Flask(__name__)
@@ -7,6 +7,8 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     init_db(app)
+    with app.app_context():
+        db.create_all()
 
     app.register_blueprint(auth.auth_bp, url_prefix='/api')
     app.register_blueprint(notes.notes_bp, url_prefix='/api')

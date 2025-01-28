@@ -17,7 +17,7 @@ def create_note():
     db.session.add(notes)
     db.session.commit()
 
-    create_embeddings_and_relationships(notes.id, content, user_id)
+    create_embeddings_and_relationships(notes.id, content)
 
     return jsonify({'note_id': notes.id})
 

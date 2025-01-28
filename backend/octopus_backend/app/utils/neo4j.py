@@ -1,18 +1,20 @@
-from py2neo import Graph
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_neo4j import Neo4jGraph
+from langchain_experimental.graph_transformers import LLMGraphTransformer
+from langchain_community.llms import Ollama
+from langchain_core.documents import Document
+import os
 
-embedder = HuggingFaceEmbeddings(model_name = "sentence-transformers/all-MiniLM-L6-v2")
-neo4j_graph = Graph("bolt://localhost:7687", auth=("neo4j", "password"))
+llm = Ollama(model="llama2")
+llm_transformer = LLMGraphTransformer(llm=llm)
+os.environ["NEO4J_URI"] = "bolt://localhost:7687"
+os.environ["NEO4J_USERNAME"] = "neo4j"
+os.environ["NEO4J_PASSWORD"] = "password"
 
-def create_embeddings_and_relationships(note_id, content, user_id):
+graph = Neo4jGraph()
 
-    embedding = embedder.embed_sentence(content)
+def create_embeddings_and_relationships(note_id, content):
 
-    query = """
-    MERGE (c:Concept {id: $note_id})
-    SET c.embedding = $embedding, c.content = $content
-    WITH c
-    MATCH (u:User {id: $user_id})
-    MERGE (u)-[:HAS_CONCEPT]->(c)
-    """
-    neo4j_graph.run(query, note_id = note_id, embedding = embedding, content = content, user_id = user_id)
+    documents = [Document(page_content=content)]
+    graph_documents = llm_transformer.convert_to_graph_documents(documents)
+
+    graph.add_graph_documents(graph_documents)

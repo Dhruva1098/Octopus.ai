@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from backend.octopus_backend.app.utils.db import db
-from backend.octopus_backend.app.models import User
+from backend.octopus_backend.app.models.User import User
 
 auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register', methods=['POST'])
