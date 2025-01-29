@@ -6,5 +6,5 @@ vector_store = AstraDB(
     collection_name="notes",
     embedding=embeddings,
     api_endpoint="-",
-    token="-"
+    token=""
 )
