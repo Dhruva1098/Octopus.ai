@@ -1,6 +1,5 @@
 
 from flask import jsonify, request, Blueprint
-
 from backend.octopus_backend.app.models.models import User, Note
 from backend.octopus_backend.app.utils.db import db
 from backend.octopus_backend.app.utils.embedding import chunk_text, embed_and_store
@@ -16,6 +15,6 @@ def create_note():
     db.session.commit()
 
     chunks = chunk_text(note.content)
-    embed_and_store(user.id, chunks)
-    return jsonify({"message": "Note created"})
+    embed_and_store(user.id, note.id, chunks)
+    return jsonify({"message": "Note created"}), 201
 
