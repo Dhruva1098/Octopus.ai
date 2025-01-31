@@ -9,5 +9,5 @@ def embed_and_store(user_id, note_id, chunks):
         logging.info(f"Storing chunk: {chunk[:80]}...(User {user_id}, Note {note_id})")
         vector_store.add_texts(
             texts=[chunk],
-            metadatas=[{"user_id": user_id, "note_id": note_id}]
+            metadatas=[{"user_id": user_id, "note_id": note_id, "date": chunk.created_at.strftime("%Y-%m-%d")}],
         )

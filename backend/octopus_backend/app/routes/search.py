@@ -5,7 +5,7 @@ from backend.octopus_backend.app.utils.rag import search_and_generate
 
 search_bp = Blueprint('search', __name__)
 @search_bp.route('/ask', methods=['POST'])
-def search():
+def ask():
     data = request.json
     user_id = int(data['user_id'])
     query = data['query']
