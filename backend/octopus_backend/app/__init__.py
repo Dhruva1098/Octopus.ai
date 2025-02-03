@@ -3,6 +3,7 @@ import logging
 from flask import Flask
 from backend.octopus_backend.app.routes.notes import notes_bp
 from backend.octopus_backend.app.routes.search import search_bp
+from backend.octopus_backend.app.routes.auth import auth_bp
 from backend.octopus_backend.app.utils.db import db
 from backend.octopus_backend.app.utils.vector_store import vector_store
 from backend.octopus_backend.app.utils import llm
@@ -25,5 +26,6 @@ def create_app():
     # Register API routes
     app.register_blueprint(notes_bp, url_prefix='/api')
     app.register_blueprint(search_bp, url_prefix='/api')
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
     return app
