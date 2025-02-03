@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timedelta
 from typing import Any, Dict
+
 from backend.octopus_backend.app.utils.llm import model
 from backend.octopus_backend.app.utils.vector_store import vector_store, embeddings
 import logging
@@ -38,39 +39,49 @@ def search_and_generate(user_id, query):
     if not context:
         context = "No relevant context found."
 
-    prompt = f"Answer based on context, do not answer from anything else, Text must only include the answer: {context}\nQuestion: {query}"
+
+    if filters["intent"] == "summary":
+        prompt= f"""
+        Summarise the following context in concise and coherent summary:
+        Context: {context}"""
+    else:
+        prompt = f"""
+        Answer the following question based on the provided context. Do not use any external knowledge.
+        Context: {context}
+        Question: {query}
+        Answer:"""
     response = model.generate_content(prompt)
     return {
         "answer": response.text.strip(),
         "note_ids": list(note_ids)
     }
 
-def parse_natural_language_query(query:str) -> Dict[str, Any]:
-    """
-    Extract structured filters (dates, topics) from natural language queries.
-    Returns a filter dictionary compatible with Astra.
-    """
+def parse_natural_language_query(query: str) -> Dict[str, Any]:
+
+    #Extract structured filters (dates, topics, summarization intent) from natural language queries.
+    #returns a dict
+
     prompt = f"""
-    Extract the following from the user's query:
-    - Topic/keywords (e.g., "machine learning", "meeting notes")
+    Analyze the user's query and extract the following:
+    - Intent: eg. is user asking for a summary or a summarization intent. return summary
+    - Topics/keywords (e.g., "machine learning", "meeting notes")
     - Date range (relative like "last week" or absolute like "March 2024")
-
-    Return ONLY a JSON object with keys: "topics", "start_date", "end_date".
-    If no dates/topics are found, set values to null.
-
+    Return ONLY a JSON object with keys: "intent", "topics", "start_date", "end_date".
     Query: {query}
     """
-
     response = model.generate_content(prompt)
     try:
         filters = json.loads(response.text)
     except json.decoder.JSONDecodeError:
-        return {"topics": None, "start_date": None, "end_date": None}
+        logging.error(f"Failed to parse LLM response: {response.text}")
+        return {"intent": None, "topics": [], "start_date": None, "end_date": None}
 
-    #need absolute dates
+    # Convert relative dates to absolute dates
     if filters.get("start_date") in ["last week", "past week"]:
         filters["start_date"] = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
     elif filters.get("start_date") == "last month":
         filters["start_date"] = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
 
     return filters
+
+

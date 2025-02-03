@@ -15,6 +15,6 @@ def create_note():
     db.session.commit()
 
     chunks = chunk_text(note.content)
-    embed_and_store(user.id, note.id, chunks)
+    embed_and_store(user.id, note.id, chunks, note.created_at)
     return jsonify({"message": "Note created"}), 201
 
