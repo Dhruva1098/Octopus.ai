@@ -6,6 +6,9 @@ from backend.octopus_backend.app.utils.llm import model
 from backend.octopus_backend.app.utils.vector_store import vector_store, embeddings
 import logging
 
+from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
+
 def search_and_generate(user_id, query):
     filters = parse_natural_language_query(query)
 
@@ -85,3 +88,22 @@ def parse_natural_language_query(query: str) -> Dict[str, Any]:
     return filters
 
 
+"""
+def hybrid_search(query, texts, embeddings, vector_store, top_k = 5):
+    vectorizer = TfidfVectorizer()
+    tdidf_matrix = vectorizer.fit_transform(texts)
+    query_vector = vectorizer.transform([query])
+    keyword_scores = (query_vector * tdidf_matrix).toarray()
+    keyword_results = [texts[i] for i in keyword_scores.argsort()[-top_k:][::-1]]
+
+    #sementic search
+    query_embedding = embeddings.embed_query(query)
+    semantic_results = vector_store.similarity_search_by_vector(
+        embedding=query_embedding,
+        k = top_k
+    )
+    semantic_texts = [results.page_content for results in semantic_results]
+
+    combined_results = list(set(keyword_results + semantic_texts))
+    return combined_results
+"""
