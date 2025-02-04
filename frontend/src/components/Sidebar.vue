@@ -26,7 +26,7 @@ import { defineProps } from 'vue'
 const props = defineProps({
   notes: {
     type: Array,
-    required: true,
-  },
+    required: true
+  }
 })
 </script>

@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import './index.css'  // Make sure this imports Tailwind’s CSS if installed
+import router from './router'
+import './index.css'  // If using Tailwind CSS
 
-createApp(App).mount('#app')
+createApp(App).use(router).mount('#app')

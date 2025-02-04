@@ -9,8 +9,16 @@
         @blur="updateTitle"
     />
 
-    <!-- tiptap editor content -->
-    <EditorContent :editor="editor" class="prose max-w-none" />
+    <!-- tiptap editor area -->
+    <EditorContent :editor="editor" class="prose max-w-none mb-4" />
+
+    <!-- Save Button -->
+    <button
+        @click="handleSave"
+        class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+    >
+      Save Note
+    </button>
   </div>
 </template>
 
@@ -23,13 +31,13 @@ import { defineProps, defineEmits } from 'vue'
 const props = defineProps({
   note: {
     type: Object,
-    required: true,
-  },
+    required: true
+  }
 })
 
-const emit = defineEmits(['update'])
+const emit = defineEmits(['save'])
 
-// Local state for the note title (optional)
+// Use a local copy of the title for editing
 const editorTitle = ref(props.note.title)
 
 // Create the editor instance
@@ -40,20 +48,19 @@ onMounted(() => {
     content: props.note.content,
     extensions: [StarterKit],
     onUpdate({ editor }) {
-      // Emit the updated HTML content to the parent component
-      emit('update', editor.getHTML())
-    },
+      // When content updates, you can choose to emit a save event on demand.
+      // Here, we do nothing on every update.
+    }
   })
 })
 
-// Destroy the editor on unmount
 onBeforeUnmount(() => {
   if (editor.value) {
     editor.value.destroy()
   }
 })
 
-// If the note content changes from outside, update the editor content
+// If the note’s content changes externally, update the editor.
 watch(
     () => props.note.content,
     (newContent) => {
@@ -63,16 +70,22 @@ watch(
     }
 )
 
-// Optionally, update the note title (this example does not propagate title changes to the parent)
+// Update the note title on blur.
 function updateTitle() {
-  // Here you might want to emit a title change event or update the note directly
-  // For this example, we simply update the note’s title locally:
   props.note.title = editorTitle.value
+}
+
+// Trigger save: emit the note object with updated content.
+function handleSave() {
+  const updatedNote = {
+    ...props.note,
+    content: editor.value.getHTML()
+  }
+  emit('save', updatedNote)
 }
 </script>
 
 <style scoped>
-/* Optional: add styles for the editor, e.g., for a Notion-like feel */
 .prose p {
   margin: 0.5em 0;
 }
