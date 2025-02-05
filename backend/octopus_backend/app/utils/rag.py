@@ -6,9 +6,6 @@ from backend.octopus_backend.app.utils.llm import model
 from backend.octopus_backend.app.utils.vector_store import vector_store, embeddings
 import logging
 
-from sklearn.feature_extraction.text import TfidfVectorizer
-import numpy as np
-
 def search_and_generate(user_id, query):
     filters = parse_natural_language_query(query)
 

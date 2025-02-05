@@ -9,16 +9,24 @@
         @blur="updateTitle"
     />
 
-    <!-- tiptap editor area -->
+    <!-- tiptap editor content -->
     <EditorContent :editor="editor" class="prose max-w-none mb-4" />
 
-    <!-- Save Button -->
-    <button
-        @click="handleSave"
-        class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-    >
-      Save Note
-    </button>
+    <!-- Action Buttons -->
+    <div class="flex space-x-4">
+      <button
+          @click="handleSave"
+          class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+      >
+        Save Note
+      </button>
+      <button
+          @click="handleDelete"
+          class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+      >
+        Delete Note
+      </button>
+    </div>
   </div>
 </template>
 
@@ -34,54 +42,58 @@ const props = defineProps({
     required: true
   }
 })
+const emit = defineEmits(['save', 'delete'])
 
-const emit = defineEmits(['save'])
-
-// Use a local copy of the title for editing
+// Use a local copy for the note title
 const editorTitle = ref(props.note.title)
 
-// Create the editor instance
+// Create the tiptap editor instance
 const editor = ref(null)
-
 onMounted(() => {
   editor.value = new Editor({
     content: props.note.content,
     extensions: [StarterKit],
     onUpdate({ editor }) {
-      // When content updates, you can choose to emit a save event on demand.
-      // Here, we do nothing on every update.
+      // (Optional: auto-save logic can go here)
     }
   })
 })
-
 onBeforeUnmount(() => {
   if (editor.value) {
     editor.value.destroy()
   }
 })
 
-// If the note’s content changes externally, update the editor.
+// When switching between notes, update local title and content.
 watch(
-    () => props.note.content,
-    (newContent) => {
-      if (editor.value && newContent !== editor.value.getHTML()) {
-        editor.value.commands.setContent(newContent)
+    () => props.note,
+    (newNote) => {
+      editorTitle.value = newNote.title
+      if (editor.value && newNote.content !== editor.value.getHTML()) {
+        editor.value.commands.setContent(newNote.content)
       }
-    }
+    },
+    { immediate: true }
 )
 
-// Update the note title on blur.
+// Update the note's title on blur.
 function updateTitle() {
   props.note.title = editorTitle.value
 }
 
-// Trigger save: emit the note object with updated content.
+// Emit the save event with the updated note (including title and content)
 function handleSave() {
   const updatedNote = {
     ...props.note,
+    title: editorTitle.value,
     content: editor.value.getHTML()
   }
   emit('save', updatedNote)
+}
+
+// Emit a delete event so the parent can handle deletion.
+function handleDelete() {
+  emit('delete', props.note)
 }
 </script>
 
